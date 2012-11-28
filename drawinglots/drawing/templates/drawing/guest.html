@@ -1,0 +1,91 @@
+{% extends 'drawing/base.html' %}
+
+{% block css %}
+  <style type="text/css">
+    .item{
+      max-width: 344px;
+    }
+    .item_wrapper{
+      margin-bottom: 10px;
+    }
+    .link_logo{
+      max-width: 39%;
+    }
+    @media (max-width: 480px) {
+      .item{
+        max-width: 95%;
+      }
+      body{
+        height: 480px;
+        padding-top: 20px;
+      }
+      .link_logo{
+        max-width: 100%;
+      }
+    }
+    .link_wrapper{
+      margin-top: 20px;
+      border-top: 1px solid #CCC;
+      padding-top: 20px;
+    }
+  </style>
+{% endblock %}
+
+{% block container %}
+  <div style="">
+    <div class="">
+      <div style="text-align:center;" class="">
+
+        <div>
+          {% if is_winner %}
+            <img class="img-polaroid item" src="{{ item.picture.url }}">
+          {% else %}
+            <img style="opacity:0.2;" class="img-polaroid item" src="{{ item.picture.url }}">
+          {% endif %}
+        </div>
+        <div>
+          <h4>您的號碼是: {{ number }}</h4>
+        </div>
+        <div>
+          <button class="btn" onclick="window.location.reload();">重新整理</button>
+        </div>
+        {% if is_winner %}
+          <div>
+            <h4>恭喜得獎了!!</h4>
+          </div>
+          <audio autoplay="autoplay">
+            <source src="{{ STATIC_URL }}winner.mp3" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        {% endif %}
+        <div class="link_wrapper">
+          <a href="http://goo.gl/0EH1h">
+            <img class="link_logo" src="https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-ash4/603427_453844401305477_1080001390_n.jpg">
+          </a>
+          <div style="margin:5px 5px 20px 5px;font-size:16px;">Powered by <a href="http://goo.gl/0EH1h">Linkwish Inc</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  var is_winner = '{{ is_winner }}'
+  /*
+  if (is_winner!='True'){
+    setInterval(function(){
+      window.location.reload()
+    }, 5000)
+  }
+  */
+  
+  window.addEventListener("load",function() {
+    // Set a timeout...
+    setTimeout(function(){
+      // Hide the address bar!
+      window.scrollTo(0, 1);
+    }, 0);
+  });
+</script>
+{% endblock %}

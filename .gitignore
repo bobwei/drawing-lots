@@ -1,0 +1,9 @@
+bin/*
+include/*
+lib/*
+.*.swp
+*.py[co]
+.Python
+.DS_Store
+drawinglots/staticfiles/
+celerybeat-schedule.db

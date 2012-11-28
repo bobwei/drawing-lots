@@ -1,0 +1,29 @@
+{% extends 'drawing/base.html' %}
+
+{% block container %}
+  <div style="text-align:center;">
+    <form method="POST">
+      <button class="btn">建立遊戲</button>
+    </form>
+    <div style="width:600px;margin:0px auto;">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>建立時間</th>
+            <th>連結</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for game in games %}
+            <tr>
+              <td>{{ game.pk }}</td>
+              <td>{{ game.created_time }}</td>
+              <td><a href="{% url drawing_demo game.pk %}">連結</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

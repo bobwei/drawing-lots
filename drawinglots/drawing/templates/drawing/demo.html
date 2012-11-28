@@ -1,0 +1,141 @@
+{% extends 'drawing/base.html' %}
+
+{% block css %}
+  <style type="text/css">
+    .item{
+      max-width: 300px;
+    }
+    .item_wrapper{
+      margin-bottom: 10px;
+    }
+    .item:hover{
+      opacity: 1;
+    }
+    body{
+      padding-top: 30px;
+    }
+    .hidden_item{
+      opacity: 0.1;
+    }
+    .game_wrapper{
+      width: 90%;
+      margin: 0px auto;
+      background: white;
+    }
+  </style>
+{% endblock %}
+
+{% block container %}
+  <div class="game_wrapper">
+    <h2  style="text-align:center;margin-bottom:30px;">
+      <a target="_blank" id="guest_url" href=""></a>
+    </h2>
+    <div class="row-fluid">
+      <div class="span4 offset2">
+        <div data-spy="affix" data-offset-top="0">
+          <div>
+            <img id="qrcode" src="http://api.qrserver.com/v1/create-qr-code/?size=300x300&data=http://{{ request.META.HTTP_HOST }}{% url drawing_guest game.pk %}">
+          </div>
+          <div>
+            <h3 style="margin: 35px 0px 10px 0px;">
+              <span id="n_guests">{{ n_guests }}</span>人已加入
+            </h3>
+          </div>
+          <div style="height:50px;">
+            <h3 id="result" style="display:none;">得獎的是: <span></span></h3>
+          </div>
+          <div style="float:right;">
+            <button class="btn" onclick="window.location.reload();">重新整理</button>
+            <button class="btn drawing">抽獎</button>
+            <form method="POST" style="margin:0px;display:inline;">
+              <input type="hidden" name="type" value="next">
+              <button class="btn">下一個</button>
+            </form>
+          </div>
+        </div> 
+      </div>
+      <div class="span6">
+        <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="game" value="{{ game.pk }}">
+          <input type="hidden" name="type" value="upload">
+          <input type="file" name="picture">
+          <button class="btn">上傳</button>
+        </form>
+        <div>
+          {% for item in items %}
+            {% if forloop.first %}
+              <div class="item_wrapper">
+                <img pk="{{ item.pk }}" class="img-polaroid item" src="{{ item.picture.url }}">
+              </div>
+            {% else %}
+              <div class="item_wrapper">
+                <img pk="{{ item.pk }}" class="img-polaroid item hidden_item" src="{{ item.picture.url }}">
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $(function(){
+    var guest_url = 'http://{{ request.META.HTTP_HOST }}{% url drawing_guest game.pk %}'
+
+    $.getJSON(
+        "http://api.bitly.com/v3/shorten?callback=?", 
+        { 
+            "format": "json",
+            "apiKey": 'R_563e93b1666ae8930d250e7ea28ea2e8',
+            "login": 'o_2r1o6vsp1i',
+            "longUrl": guest_url
+        },
+        function(response)
+        {
+            $('#guest_url').attr('href', response.data.url).html(response.data.url)
+        }
+    );
+
+    var n_guests = {{ n_guests }}
+    var item_id = $($('.item')[0]).attr('pk')
+
+    $('.drawing').click(function(){
+      $('#result span').html('')
+      $('#result').show()
+      $.ajax({
+        url: '{% url drawing_drawing %}',
+        data: {
+          item_id: item_id
+        },
+        dataType: 'json',
+        error: function(xhr) {
+          alert('error')
+        },
+        success: function(response) {
+          $('#result span').html(response.number)
+        }
+      });
+      
+    })
+    
+    setInterval(function(){
+      $.ajax({
+        url: '{% url drawing_n_guests %}',
+        data: {
+          item_id: item_id
+        },
+        dataType: 'json',
+        error: function(xhr) {
+          
+        },
+        success: function(response) {
+          $('#n_guests').html(response.n_guests)
+        }
+      });
+    }, 8000)
+    
+  })
+</script>
+{% endblock %}
