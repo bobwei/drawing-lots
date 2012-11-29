@@ -47,6 +47,10 @@
           <div style="float:right;">
             <button class="btn" onclick="window.location.reload();">重新整理</button>
             <button class="btn drawing">抽獎</button>
+            <audio id="drawing_audio">
+              <source src="{{ STATIC_URL }}snare_8s.mp3" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
             <form method="POST" style="margin:0px;display:inline;">
               <input type="hidden" name="type" value="next">
               <button class="btn">下一個</button>
@@ -102,8 +106,11 @@
     var item_id = $($('.item')[0]).attr('pk')
 
     $('.drawing').click(function(){
-      $('#result span').html('')
       $('#result').show()
+      $('#result span').html('')
+      $('#result span').hide()
+      $('#drawing_audio').trigger("play")
+      
       $.ajax({
         url: '{% url drawing_drawing %}',
         data: {
@@ -116,7 +123,13 @@
         success: function(response) {
           $('#result span').html(response.number)
         }
-      });
+      })
+      
+      var ref = null
+      clearTimeout(ref)
+      ref = setTimeout(function(){
+        $('#result span').show()
+      }, 7000)
       
     })
     
